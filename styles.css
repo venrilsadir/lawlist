@@ -1,6 +1,7 @@
-.lawlist-olchar, .lawlist-ulchar {
+/* Color fallback; font metrics come from .cm-formatting-list-* on the same element */
+.lawlist-marker-widget.lawlist-olchar,
+.lawlist-marker-widget.lawlist-ulchar {
     color: var(--list-marker-color);
-    padding-left: 18px;
 }
 .lawlist-settings-desc code {
     background-color: #444;

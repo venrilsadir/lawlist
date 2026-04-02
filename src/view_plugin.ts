@@ -17,29 +17,45 @@ import { renderPattern } from "src/patterns";
 import type { SyntaxNode, SyntaxNodeRef } from "@lezer/common";
 import type LawListPlugin from './main';
 
+/** Match native Live Preview list-marker classes so typography stays consistent when selections drop the widget. */
+function addListMarkerViewClasses(el: HTMLElement, kind: "ol" | "ul", indentLevel: number): void {
+	const depth = (indentLevel % 3) + 1;
+	el.classList.add(
+		"cm-formatting",
+		"cm-formatting-list",
+		kind === "ol" ? "cm-formatting-list-ol" : "cm-formatting-list-ul",
+		`cm-list-${depth}`,
+		"lawlist-marker-widget",
+	);
+}
+
 class LawListEnumeratorWidget extends WidgetType {
-    constructor (private enumerator: number, private pattern: string) { super(); }
-    toDOM(view: EditorView): HTMLElement {
-        const div = document.createElement('span');
-        
-        // For some styling in `styles.css`.
-        div.classList.add("lawlist-olchar");
-
-        // div.innerText = parsePattern(this.customPattern || store.patterns[this.indentLevel] || "1. ", this.enumerator);
-        div.innerText = renderPattern(this.pattern || "1. ", this.enumerator);
-
-        return div;
-    }
+	constructor(
+		private enumerator: number,
+		private pattern: string,
+		private indentLevel: number,
+	) {
+		super();
+	}
+	toDOM(view: EditorView): HTMLElement {
+		const div = document.createElement("span");
+		addListMarkerViewClasses(div, "ol", this.indentLevel);
+		div.classList.add("lawlist-olchar");
+		div.innerText = renderPattern(this.pattern || "1. ", this.enumerator);
+		return div;
+	}
 }
 class LawListULWidget extends WidgetType {
-    constructor (private listchar: string) { super(); }
-    toDOM(view: EditorView): HTMLElement {
-        const div = document.createElement('span');
-        // For some styling in `styles.css`.
-        div.classList.add("lawlist-ulchar");
-        div.innerText = this.listchar || "• ";
-        return div;
-    }
+	constructor(private listchar: string, private indentLevel: number) {
+		super();
+	}
+	toDOM(view: EditorView): HTMLElement {
+		const div = document.createElement("span");
+		addListMarkerViewClasses(div, "ul", this.indentLevel);
+		div.classList.add("lawlist-ulchar");
+		div.innerText = this.listchar || "• ";
+		return div;
+	}
 }
 
 export class LawListCMViewPlugin implements PluginValue {
@@ -94,7 +110,7 @@ export class LawListCMViewPlugin implements PluginValue {
                                 node.from,
                                 node.to + (custom ? custom.length + 2 : 0), // If custom is defined, hide it as well.
                                 Decoration.replace({
-                                    widget: new LawListULWidget(custom || ul_patterns[indentLevel])
+                                    widget: new LawListULWidget(custom || ul_patterns[indentLevel], indentLevel)
                                 })
                             );
                         } else if (ol && (custom || ol_patterns[indentLevel])) {
@@ -102,7 +118,7 @@ export class LawListCMViewPlugin implements PluginValue {
                                 node.from,
                                 node.to + (custom ? custom.length + 2 : 0), // If custom is defined, hide it as well.
                                 Decoration.replace({
-                                    widget: new LawListEnumeratorWidget(ol_enumerator, custom || ol_patterns[indentLevel])
+                                    widget: new LawListEnumeratorWidget(ol_enumerator, custom || ol_patterns[indentLevel], indentLevel)
                                 })
                             );
                         }
