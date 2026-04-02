@@ -146,7 +146,7 @@ class LawListSettingsTab extends PluginSettingTab {
 		const desc2 = containerEl.createEl("p");
 		desc2.classList.add("lawlist-settings-desc");
 		desc2.appendText("For each indentation level in ordered lists, type in the first enumerator. Supported numbering systems are:");
-		desc2.appendChild(createEl("code", { text: " 1, I, i, ①, A, AA, a, aa" }));
+		desc2.appendChild(createEl("code", { text: " 1, I, i, ①, A, AA, a, aa, 가… (Korean legal: 가·나·다 …, 84-letter cycle)" }));
 		desc2.appendText(". Enumerators can also include other characters as prefix/suffix, e.g. ");
 		desc2.appendChild(createEl("code", { text: "(a) " }));
 		desc2.appendText(" or ");
